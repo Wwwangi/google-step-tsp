@@ -11,7 +11,7 @@ CHALLENGES = 4
 
 
 def generate_sample_output():
-    for i in range(6,7):
+    for i in range(3,4):
         cities = read_input(f'input_{i}.csv')
         solver = solver_sa
         name = 'output'
