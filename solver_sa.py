@@ -69,7 +69,7 @@ def solve(cities):
 
     #Apply SA algorithm -> an algorithm depends on "random number" so the result should look different each time you run it
     alpha = 0.999 #annealing rate
-    initial_t = 30  #initial temperature
+    initial_t = 7  #initial temperature
     final_t = 1 #final teperature
     iteration = 50000
 
