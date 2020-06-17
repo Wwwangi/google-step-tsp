@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 
 from common import print_tour, read_input
 
+#Calculate the distance between city1 and city2
 def distance(city1, city2):
     return math.sqrt((city1[0] - city2[0]) ** 2 + (city1[1] - city2[1]) ** 2)
 
-#Calculate the total length of a path
+#Calculate the total length of a path (use the dist matrix to avoid doing redundant calculation of distances between cities)
 def path_length(tour, dist):
     value = 0
     for i in range(len(tour)-1):
@@ -27,17 +28,21 @@ def intersection_det(point1, point2, point3, point4):
     x4 = point4[0]
     y4 = point4[1]
     den = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4)
+    # Denominator should not be 0
     if den != 0:
+        # Equation to find the intersection point of two lines
         x = ((x1*y2-y1*x2)*(x3-x4) - (x1-x2)*(x3*y4-y3*x4))/den
         y = ((x1*y2-y1*x2)*(y3-y4) - (y1-y2)*(x3*y4-y3*x4))/den
         x_range_1 = sorted([x1, x2])
         x_range_2 = sorted([x3, x4])
         y_range_1 = sorted([y1, y2])
         y_range_2 = sorted([y3, y4])
+        # Determing if the intersection point is on the line segment
         if (x_range_1[0]<=x<=x_range_1[1] and y_range_1[0]<=y<=y_range_1[1]) and (x_range_2[0]<=x<=x_range_2[1] and y_range_2[0]<=y<=y_range_2[1]):
             return True
     return False
 
+# The main function to find the "optimal" path
 def solve(cities):
     N = len(cities)
 
@@ -48,8 +53,7 @@ def solve(cities):
             dist[i][j] = dist[j][i] = distance(cities[i], cities[j])
 
     #Construct the random initial path using greedy search
-    #current_city = np.int(np.ceil(np.random.rand()*(N-1)))
-    current_city = 0
+    current_city = np.int(np.ceil(np.random.rand()*(N-1)))
     unvisited_cities = set(range(0, N))
     unvisited_cities.remove(current_city)
     tour = [current_city]
@@ -60,24 +64,27 @@ def solve(cities):
         unvisited_cities.remove(next_city)
         tour.append(next_city)
         current_city = next_city
-
+    # save the current path length of the path found by greedy search
     current_length = path_length(tour,dist)
     best_length = current_length
 
 
     #Apply SA algorithm -> an algorithm depends on "random number" so the result should look different each time you run it
     alpha = 0.999 #annealing rate
-    initial_t = 7  #initial temperature
+    initial_t = 7  #initial temperature (after my experiment, i found that it's more likely to find a better path if we set the initial_t small for big N and set the initial_t large for small N)
     final_t = 1 #final teperature
-    iteration = 50000
+    iteration = 50000 #iteration times at a certain temperature (much more possbile to find a better path if this value is large but it takes a long time)
 
     current_path = tour.copy()
     best_path = tour.copy()
     visualize = []
 
+    #annealing process
     while initial_t > final_t:
+        #to monitor the progress
         print(initial_t)
         print(best_length)
+        # at the certain temperature, loop 50000 times to find that if there are two points can be swapped, reversed or re-inserted to form a shorter path
         for i in range(iteration):
             random_number = np.random.rand()
             #Generate two different random numbers
@@ -86,7 +93,7 @@ def solve(cities):
                 pos2 = np.int(np.ceil(np.random.rand()*(N-1)))
                 if pos1 != pos2:
                     break
-            #Three ways to choose from by chance
+            #Three ways to choose from by chance (increase the diversity and possibility to find a shorter path)
             #First one
             #Swap two elements
             if random_number < 0.3:
@@ -118,17 +125,18 @@ def solve(cities):
                 #no update
                 else:
                     tour = current_path.copy()
-        #anneal
+        #anneal (multiply by a constant alpha so that the algorithm will converge at last)
         initial_t *= alpha
         visualize.append(best_length)
 
-    #to see how path length decreases
+    #draw a figure to see how path length decreases
     plt.plot(np.array(visualize))
     plt.show()
     print(best_length)
+
     tour = best_path.copy()
 
-    #if there are intersections, flip them
+    #if there are line segments that intersect with each other, flip them
     while True:
         no_intersection = True
         for i in range(N):
