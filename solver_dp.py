@@ -5,11 +5,11 @@ import math
 
 from common import print_tour, read_input
 
-
+#calculate the distance between city1 and city2
 def distance(city1, city2):
     return math.sqrt((city1[0] - city2[0]) ** 2 + (city1[1] - city2[1]) ** 2)
 
-
+#the main function to obtain the optimal path (Here i say "optimal" because dp algorithm will give us the optimal path for sure since it considers all kinds of possibilities -> long running time)
 def solve(cities):
     N = len(cities)
     tour = []
@@ -28,6 +28,7 @@ def solve(cities):
         dp_table[i][0] = dist[i][0]
 
     #loop through dp_table columns (from 1 to 2^(N-1)) because the cost for set i that has more vertex to pass should depend on the cost for set i that has less vertex to pass
+    #Goal: To update the dp_table from left to right
     for i in range(1, 2**(N-1)):
         #loop through dp_table rows (from 1 to N)
         #Goal: To check if the city j is in the set i. If not, we can update dp[j][i]
@@ -36,12 +37,13 @@ def solve(cities):
             if not (1 << (j-1)) & i :
                 min_cost = float('inf')
                 #loop through city 1 to N again.
-                #Goal: to compare the costs for different path
+                #Goal: to compare the costs for different path that starts with different point k
                 for k in range(1, N):
                     #Ensure that city k is in the set i. Path: j->k->...->0
                     if (1 << (k-1)) & i:
                         #remove k from set i
                         temp = i - (1 << (k-1))
+                        # current cost = the distance from point j to k + the distance from k to the starting point (passing all the points in temp)
                         current_cost = dist[j][k] + dp_table[k][temp]
                         if current_cost < min_cost:
                             min_cost = current_cost
@@ -58,6 +60,7 @@ def solve(cities):
             min_cost = dist[0][i] + dp_table[i][path]
             temp_city = i
     dp_table[0][-1]  = min_cost
+    #temp_city is the last node on the path
     tour.append(temp_city)
 
     #back tracking to find the optimal path
