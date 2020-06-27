@@ -53,7 +53,8 @@ def solve(cities):
             dist[i][j] = dist[j][i] = distance(cities[i], cities[j])
 
     #Construct the random initial path using greedy search
-    current_city = np.int(np.ceil(np.random.rand()*(N-1)))
+    #current_city = np.int(np.ceil(np.random.rand()*(N-1)))
+    current_city = 0
     unvisited_cities = set(range(0, N))
     unvisited_cities.remove(current_city)
     tour = [current_city]
@@ -71,7 +72,7 @@ def solve(cities):
 
     #Apply SA algorithm -> an algorithm depends on "random number" so the result should look different each time you run it
     alpha = 0.999 #annealing rate
-    initial_t = 7  #initial temperature (after my experiment, i found that it's more likely to find a better path if we set the initial_t small for big N and set the initial_t large for small N)
+    initial_t = 3  #initial temperature (after my experiment, i found that it's more likely to find a better path if we set the initial_t small for big N and set the initial_t large for small N)
     final_t = 1 #final teperature
     iteration = 50000 #iteration times at a certain temperature (much more possbile to find a better path if this value is large but it takes a long time)
 
