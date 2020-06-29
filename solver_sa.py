@@ -2,6 +2,7 @@ import sys
 import math
 import numpy as np
 import matplotlib.pyplot as plt 
+import csv
 
 from common import print_tour, read_input
 
@@ -46,6 +47,13 @@ def intersection_det(point1, point2, point3, point4):
 def solve(cities):
     N = len(cities)
 
+    with open('output_7.csv') as f:
+        tour = []
+        for line in f.readlines()[1:]:
+            order_num = line.split(',')
+            tour.append(int(order_num[0]))
+
+
     #Construct the distance matrix
     dist = [[0] * N for i in range(N)]
     for i in range(N):
@@ -54,17 +62,17 @@ def solve(cities):
 
     #Construct the random initial path using greedy search
     #current_city = np.int(np.ceil(np.random.rand()*(N-1)))
-    current_city = 0
-    unvisited_cities = set(range(0, N))
-    unvisited_cities.remove(current_city)
-    tour = [current_city]
+    # current_city = 0
+    # unvisited_cities = set(range(0, N))
+    # unvisited_cities.remove(current_city)
+    # tour = [current_city]
 
-    while unvisited_cities:
-        next_city = min(unvisited_cities,
-                        key=lambda city: dist[current_city][city])
-        unvisited_cities.remove(next_city)
-        tour.append(next_city)
-        current_city = next_city
+    # while unvisited_cities:
+    #     next_city = min(unvisited_cities,
+    #                     key=lambda city: dist[current_city][city])
+    #     unvisited_cities.remove(next_city)
+    #     tour.append(next_city)
+    #     current_city = next_city
     # save the current path length of the path found by greedy search
     current_length = path_length(tour,dist)
     best_length = current_length
@@ -72,7 +80,7 @@ def solve(cities):
 
     #Apply SA algorithm -> an algorithm depends on "random number" so the result should look different each time you run it
     alpha = 0.999 #annealing rate
-    initial_t = 3  #initial temperature (after my experiment, i found that it's more likely to find a better path if we set the initial_t small for big N and set the initial_t large for small N)
+    initial_t = 1.3  #initial temperature (after my experiment, i found that it's more likely to find a better path if we set the initial_t small for big N and set the initial_t large for small N)
     final_t = 1 #final teperature
     iteration = 50000 #iteration times at a certain temperature (much more possbile to find a better path if this value is large but it takes a long time)
 
